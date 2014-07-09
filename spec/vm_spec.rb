@@ -28,12 +28,13 @@ describe "VM tests:" do
     rv = vm.cpu
     #puts "VM #{vm}"
 
-    it "should load 35 and 88" do
-      #expect(vm.stack[vm.sp]).to eq(100)
+    it "should load 1 and 2" do
+      expect(vm.stack[vm.sp-1]).to eq(1)
+      expect(vm.stack[vm.sp]).to eq(2)
     end
 
     it "and halt" do
-      #expect(rv).to eq(Bytecodes::HALT)
+      expect(rv).to eq(Bytecodes::HALT)
     end
   end
 

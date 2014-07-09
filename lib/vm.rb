@@ -20,6 +20,8 @@ class VM
   at_exit { puts TRACE_OUTPUT.join("") }
   TRACE_OUTPUT = []
 
+  $TracingGlobally = false
+
   def initialize(code, ip = 0, datasize = 0)
     @code = code
     @ip = ip
@@ -27,11 +29,23 @@ class VM
     @sp = -1
     @data = Array.new()
     @stack = Array.new()
-    @tracing = true
+    @tracing = false
+    trace { ("-" * 60) + "\n" }
+    #trace { self }
   end
 
+
+  def self.disable_tracking_globally
+    $TracingGlobally = false
+  end
+
+  def self.enable_tracking_globally
+    $TracingGlobally = true
+  end
+
+
   def trace
-    if @tracing
+    if @tracing || $TracingGlobally
       TRACE_OUTPUT << yield
     end
   end
@@ -53,14 +67,12 @@ class VM
     buf
   end
 
-  def cpu
+  def exec
 
+    # fetch opcode
     opcode = code[ip]
 
     while opcode != Bytecodes::HALT && ip <= code.length
-      # fetch opcode
-      #opcode = code[ip]
-      #@ip += 1
 
       trace { display_instruction }
       @ip += 1
@@ -88,7 +100,8 @@ class VM
       when Bytecodes::PRINT
         v = stack[sp]
         @sp -= 1
-        puts "val #{v}"
+        puts v.to_s
+        trace { v.to_s }
       # when Bytecodes::POP
       # when Bytecodes::CALL
       # when Bytecodes::RET
@@ -123,12 +136,12 @@ class VM
       operands = (start_idx..end_idx).map { |idx| code[idx] }.join(", ")
     end
 
-    sprintf("%04d:\t%-11s\t%-10s",
+    sprintf("%04d: %-10s %-10s",
       ip, Bytecodes.to_instruction_from_opcode(opcode.opcode), operands)
   end
 
   def dump_stack
-    "stack=[ " + stack.map { |s| s }.join(", ") + " ]"
+    sprintf("\t%-10s", "stack=[ " + stack.map { |s| s }.join(", ") + " ]")
   end
 
   def dump_data_memory

@@ -13,24 +13,24 @@ After watching Terence Parr's great video on creating virtual machines (https://
 
 == Bytecodes
 
-* iadd
-* isub
-* imul
-* iil
-* ieq
-* br
-* brt
-* brf
-* iconst
-* load
-* gloads
-* store
-* gstore
-* print
-* pop
-* call
-* ret
-* halt
+* IADD
+* ISUB
+* IMUL
+* IIL
+* IEQ
+* BR
+* BRT
+* BRF
+* ICONST
+* LOAD
+* GLOAD
+* STORE
+* GSTORE
+* PRINT
+* POP
+* CALL
+* RET
+* HALT
 
 == Contributing
 

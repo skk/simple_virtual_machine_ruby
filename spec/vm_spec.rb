@@ -3,21 +3,14 @@ require 'vm'
 require 'bytecodes'
 require 'pp'
 
-describe "minimal vm" do
-  it "create minimal vm" do
-    vm = VM.new([])
-    vm.cpu
-  end
-end
-
-describe "VM tests" do
+describe "VM tests:" do
   it "should halt" do
     vm = VM.new([Bytecodes::HALT])
     rv = vm.cpu
-    expect(rv).to be == Bytecodes::HALT
+    expect(rv.opcode).to eq(Bytecodes::HALT.opcode)
   end
 
-  context "it should load, than halt" do
+  context "it should load and halt" do
     vm = VM.new([Bytecodes::ICONST, 100, Bytecodes::HALT])
     rv = vm.cpu
 
@@ -29,4 +22,19 @@ describe "VM tests" do
       expect(rv).to eq(Bytecodes::HALT)
     end
   end
+
+  context "it should load 2 constants and halt" do
+    vm = VM.new([Bytecodes::ICONST, 1, Bytecodes::ICONST, 2, Bytecodes::HALT])
+    rv = vm.cpu
+    #puts "VM #{vm}"
+
+    it "should load 35 and 88" do
+      #expect(vm.stack[vm.sp]).to eq(100)
+    end
+
+    it "and halt" do
+      #expect(rv).to eq(Bytecodes::HALT)
+    end
+  end
+
 end

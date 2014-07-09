@@ -9,16 +9,15 @@ class VM
   attr_accessor :sp
 
   # code storage
-  attr_accessor :code
+  attr_accessor :code     # aka code
   # data storage
-  attr_accessor :data
+  attr_accessor :data     # aka globals
   # stack storage
-  attr_accessor :stack
+  attr_accessor :stack    # aka stack
 
   attr_accessor :tracing
 
-  at_exit { puts TRACE_OUTPUT }
-
+  at_exit { puts TRACE_OUTPUT.join("") }
   TRACE_OUTPUT = []
 
   def initialize(code, ip = 0, datasize = 0)
@@ -37,13 +36,34 @@ class VM
     end
   end
 
+
+  def format_instr_or_object(o)
+    if o.kind_of?(Instruction)
+      Bytecodes.to_instruction_from_opcode(o.opcode)
+    else
+      "#{o}"
+    end
+  end
+
+
+  def to_s
+    buf = "FP #{fp}, IP #{ip}, SP #{sp},\nDATA #{data},\nSTACK #{stack},\nCODE ["
+    buf << code.map { |k| format_instr_or_object(k) }.join(", ")
+    buf << "]"
+    buf
+  end
+
   def cpu
-    while ip <= code.length
+
+    opcode = code[ip]
+
+    while opcode != Bytecodes::HALT && ip <= code.length
       # fetch opcode
-      opcode = code[ip]
-      @ip += 1
+      #opcode = code[ip]
+      #@ip += 1
 
       trace { display_instruction }
+      @ip += 1
 
       # decode
       case opcode
@@ -73,33 +93,63 @@ class VM
       # when Bytecodes::CALL
       # when Bytecodes::RET
       when Bytecodes::HALT
-        return Bytecodes::HALT
+        # pass
       else
-        return Bytecodes::INVALID
+        rv = Bytecodes::INVALID
+        raise "Invalid opcode #{opcode} at ip = #{ip-1}"
       end
 
       trace { dump_stack }
+      trace { "\n" }
       opcode = code[ip]
     end
 
     trace { display_instruction }
     trace { dump_stack }
+    trace { "\n" }
     trace { dump_data_memory }
+    trace { dump_code_memory }
+
+    Bytecodes::HALT
   end
 
 
   def display_instruction
+    opcode = code[ip]
+
+    if (opcode.operand_count > 0)
+      start_idx = ip+1
+      end_idx = ip+opcode.operand_count
+      operands = (start_idx..end_idx).map { |idx| code[idx] }.join(", ")
+    end
+
+    sprintf("%04d:\t%-11s\t%-10s",
+      ip, Bytecodes.to_instruction_from_opcode(opcode.opcode), operands)
   end
 
   def dump_stack
-    buf = "stack=["
-    (1..sp).each |k|
-      buf << " #{k}"
-    end
-
+    "stack=[ " + stack.map { |s| s }.join(", ") + " ]"
   end
 
   def dump_data_memory
+    addr = -1
+    buf = "Data memory:\n"
+    data.each do |d|
+      addr += 1
+      buf << sprintf("%04d: %s\n", addr, d)
+    end
+    buf + "\n"
   end
+
+  def dump_code_memory
+    addr = 0
+    buf = "Code memory:\n"
+    code.each do |c|
+      buf << sprintf("%04d: %s\n", addr, format_instr_or_object(c))
+      addr += 1
+    end
+    buf + "\n"
+  end
+
 
 end

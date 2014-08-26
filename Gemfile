@@ -21,5 +21,7 @@ group :development do
   # Guard
   gem 'rb-fsevent', :require => false if RUBY_PLATFORM =~ /darwin/i
   gem 'guard-rspec', '>= 4.0.0'
+
+  gem 'ripper-tags'
 end
 

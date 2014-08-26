@@ -1,6 +1,5 @@
 require 'ruby_enum'
 
-
 class Instruction
   attr_accessor :opcode
   attr_accessor :operand_count
@@ -15,7 +14,6 @@ class Instruction
 end
 
 class Bytecodes
-
   include Ruby::Enum
 
   define :INVALID, Instruction.new(0)
@@ -38,10 +36,7 @@ class Bytecodes
   define :RET, Instruction.new(17, 1)
   define :HALT, Instruction.new(18)
 
-
-
   def self.to_instruction_from_opcode(opcode)
     Bytecodes.keys[opcode]
   end
-
 end

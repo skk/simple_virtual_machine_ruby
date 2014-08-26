@@ -1,18 +1,18 @@
 class VM
 
-  class << self
-    attr_accessor :module_tracing
+#  class << self
+    #attr_accessor :module_tracing
 
-    module_tracing = true
+    #module_tracing = true
 
-    def disable_module_tracing
-      module_tracing = false
-    end
+    #def disable_module_tracing
+      #module_tracing = false
+    #end
 
-    def enable_module_tracing
-      module_tracing = true
-    end
-  end
+    #def enable_module_tracing
+      #module_tracing = true
+    #end
+  #end
 
   # instruction pointer
   attr_accessor :ip
@@ -47,7 +47,7 @@ class VM
   end
 
   def trace
-    TRACE_OUTPUT << yield if tracing || VM.module_tracing
+    TRACE_OUTPUT << yield if tracing || VM.tracing
   end
 
   def format_instr_or_object(o)
@@ -133,12 +133,12 @@ class VM
       operands = (start_idx..end_idx).map { |idx| code[idx] }.join(', ')
     end
 
-    puts format('%04d: %-10s %-10s', ip,
-                Bytecodes.to_instruction_from_opcode(opcode.opcode), operands)
+    format('%04d: %-10s %-10s',
+           ip, Bytecodes.to_instruction_from_opcode(opcode.opcode), operands)
   end
 
   def dump_stack
-    puts format("\t%-10s", 'stack=[ ' + stack.map { |s| s }.join(', ') + ' ]')
+    format("\t%-10s", 'stack=[ ' + stack.map { |s| s }.join(', ') + ' ]')
   end
 
   def dump_data_memory
@@ -161,4 +161,8 @@ class VM
     buf + "\n"
   end
 
+  # add class instance variable
+  class << self
+    attr_accessor :tracing
+  end
 end

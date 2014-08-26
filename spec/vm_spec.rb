@@ -3,14 +3,13 @@ require 'vm'
 require 'bytecodes'
 require 'pp'
 
-
-VM.disable_tracking_globally()
+VM.enable_module_tracing()
 
 describe "VM tests:" do
   it "should halt" do
     vm = VM.new([Bytecodes::HALT])
     rv = vm.exec
-    expect(rv.opcode).to eq(Bytecodes::HALT.opcode)
+    expect(rv).to neq(Bytecodes::HALT)
   end
 
   context "it should load and halt" do
@@ -29,7 +28,7 @@ describe "VM tests:" do
   context "it should load 2 constants and halt" do
     vm = VM.new([Bytecodes::ICONST, 1, Bytecodes::ICONST, 2, Bytecodes::HALT])
     rv = vm.exec
-    #puts "VM #{vm}"
+    # puts "VM #{vm}"
 
     it "should load 1 and 2" do
       expect(vm.stack[vm.sp-1]).to eq(1)
